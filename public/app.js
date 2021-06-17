@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Route from './controller/routes.js'
 import * as Auth from './controller/auth.js'
 import * as ProductPage from './viewpage/product_page.js'
@@ -11,7 +12,7 @@ window.onload = () => {
     Route.routing(pathname, hash);
 }
 
-window.addEventListener('popstate', e=>{
+window.addEventListener('popstate', e => {
     e.preventDefault();
     const pathname = e.target.location.pathname;
     const hash = e.target.location.hash;
