@@ -8,13 +8,34 @@ admin.initializeApp({
 });
 
 const Constant = require('./constant.js');
+
 //cf==cloud function
 exports.cf_addProduct = functions.https.onCall(addProduct);
 exports.cf_getProductList = functions.https.onCall(getProductList);
 exports.cf_getProductById = functions.https.onCall(getProductById);
+exports.cf_updateProduct = functions.https.onCall(updateProduct);
 
 function isAdmin(email) {
     return Constant.adminEmails.includes(email);
+}
+
+async function updateProduct(productInfo, context) {
+    // productInfo = { docId, data }
+    if (!isAdmin(context.auth.token.email)) {
+        if (Constant.DEV) console.log('not admin', context.auth.token.email);
+        throw new functions.https.HttpsError('unauthenticated', 'Only admin may invoke this function');
+    }
+
+    try {
+        await admin.firestore()
+            .collection(Constant.collectionNames.PRODUCT)
+            .doc(productInfo.docId)
+            .update(productInfo.data);
+    } catch (error) {
+        if (Constant.DEV) {
+            throw new functions.https.HttpsError('internal', 'updateProduct failed');
+        }
+    }
 }
 
 /**

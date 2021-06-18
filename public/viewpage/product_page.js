@@ -85,7 +85,7 @@ export async function product_page() {
             const label = Util.disableButton(button);
             await Edit.edit_product(e.target.docId.value);
             Util.enableButton(button, label);
-        })
+        });
     }
 
 }
@@ -133,7 +133,7 @@ async function addNewProduct(form) {
 
 function buildProductCard(product) {
     return `
-    <div class="card" style="width: 18rem; display: inline-block">
+    <div id="card-${product-docId}" class="card" style="width: 18rem; display: inline-block">
         <img src="${product.imageURL}" class="card-img-top">
         <div class="card-body">
             <h5 class="card-title">${product.name}</h5>

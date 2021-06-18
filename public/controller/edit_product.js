@@ -23,7 +23,7 @@ export function addEventListeners() {
         reader.onload = () => Element.formEditProduct.imageTag.src = reader.result;
     });
 
-    Element.formEditProduct.form.addEventListener('submit', e => {
+    Element.formEditProduct.form.addEventListener('submit', async e => {
         e.preventDefault();
         const button = e.target.getElementsByTagName('button')[0];
         const label = Util.disableButton(button);
@@ -44,8 +44,27 @@ export function addEventListeners() {
             return;
         }
 
-        // TODO: Complete vid 14 at 1:14s timestamp
-
+        try {
+            if (imageFile2Upload) {
+                const imageInfo = await FirebaseController.uploadImage(imageFile2Upload, e.target.imageName.value);
+                p.imageURL = imageInfo.imageURL;
+            }
+            // update firestore of the doc
+            await FirebaseController.updateProduct(p);
+            // update web browser
+            const cardTag = document.getElementById(`card-${p.docId}`);
+            if (imageFile2Upload) {
+                cardTag.getElementsByTagName('img')[0].src = p.imageURL;
+            }
+            cardTag.getElementsByClassName('card-title')[0].innerHTML = p.name;
+            cardTag.getElementsByClassName('card-text')[0].innerHTML = `$ ${p.sprice}<br > ${p.summary}`;
+            Util.info('Updated', `${p.name} is updated successfully`, Element.modalAddProduct);
+        } catch (error) {
+            if (Constant.DEV) {
+                console.log(error);
+                Util.info('Update product error', JSON.stringify(error), Element.modalAddProduct);
+            }
+        }
         Util.enableButton(button, label);
     });
 }
@@ -73,6 +92,8 @@ export async function edit_product(docId) {
     Element.formEditProduct.form.summary.value = product.summary;
     Element.formEditProduct.imageTag.src = product.imageURL;
     Element.formEditProduct.errorImage.innerHTML = '';
+    Element.formEditProduct.imageButton.value = null;
+    imageFile2Upload = null;
 
     Element.modalEditProduct.show();
 }

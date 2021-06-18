@@ -53,3 +53,13 @@ export async function getProductById(docId) {
         return null;
     }
 }
+
+const cf_updateProduct = firebase.functions().httpsCallable('cf_updateProduct');
+export async function updateProduct(product) {
+    const docId = product.docId;
+    const data = product.serializeForUpdate();
+    await cf_updateProduct({
+        docId,
+        data
+    });
+}
