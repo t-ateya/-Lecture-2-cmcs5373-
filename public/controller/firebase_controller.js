@@ -77,11 +77,15 @@ export async function deleteProduct(docId, imageName) {
 	await ref.delete();
 }
 
-
-
-const cf_getUserList = firebase.functions().httpsCallable('cf_getUserList');
+const cf_getUserList = firebase.functions().httpsCallable("cf_getUserList");
 export async function getUserList() {
-const result = await cf_getUserList();
-return result.data;
+	const result = await cf_getUserList();
+	return result.data;
 }
 
+
+
+const cf_updateUser = firebase.functions().httpsCallable("cf_updateUser");
+export async function updateUser(uid, update) {
+	await cf_updateUser({uid, update});
+}

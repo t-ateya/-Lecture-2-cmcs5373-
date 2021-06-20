@@ -16,9 +16,36 @@ exports.cf_getProductById = functions.https.onCall(getProductById);
 exports.cf_updateProduct = functions.https.onCall(updateProduct);
 exports.cf_deleteProduct = functions.https.onCall(deleteProduct);
 exports.cf_getUserList = functions.https.onCall(getUserList);
+exports.cf_updateUser = functions.https.onCall(updateUser;
 
 function isAdmin(email) {
 	return Constant.adminEmails.includes(email);
+}
+
+async function updateuser(data, context) {
+ // data = {uid, update} === update = {key: value}
+	if (!isAdmin(context.auth.token.email)) {
+		if (Constant.DEV) console.log("not admin", context.auth.token.email);
+		throw new functions.https.HttpsError(
+			"unauthenticated",
+			"Only admin may invoke this function"
+		);
+	}
+
+	try {
+		const uid = data.uid;
+const update = data.update;
+await admin.auth().updateUser(uid, update);
+	} catch (error) {
+		if (Constant.DEV) {
+			console.log(error);
+
+			throw new functions.https.HttpsError(
+				"internal",
+				"updateUser failed"
+			);
+		}
+	}
 }
 
 async function getUserList(data, context) {
@@ -41,7 +68,7 @@ async function getUserList(data, context) {
 			userList.push(...result.users);
 			nextPageToken = result.pageToken;
 		}
-		return result;
+		return userList;
 	} catch (error) {
 		if (Constant.DEV) {
 			console.log(error);
