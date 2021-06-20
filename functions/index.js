@@ -16,14 +16,39 @@ exports.cf_getProductById = functions.https.onCall(getProductById);
 exports.cf_updateProduct = functions.https.onCall(updateProduct);
 exports.cf_deleteProduct = functions.https.onCall(deleteProduct);
 exports.cf_getUserList = functions.https.onCall(getUserList);
-exports.cf_updateUser = functions.https.onCall(updateUser;
+exports.cf_updateUser = functions.https.onCall(updateUser);
+exports.cf_deleteUser = functions.https.onCall(cf_deleteUser);
 
 function isAdmin(email) {
 	return Constant.adminEmails.includes(email);
 }
 
+async function deleteUser(data, context) {
+	// data => uid
+
+	if (!isAdmin(context.auth.token.email)) {
+		if (Constant.DEV) console.log("not admin", context.auth.token.email);
+		throw new functions.https.HttpsError(
+			"unauthenticated",
+			"Only admin may invoke this function"
+		);
+	}
+	try {
+		await admin.auth().deleteUser(data);
+} catch (error) {
+		if (Constant.DEV) {
+			console.log(error);
+
+			throw new functions.https.HttpsError(
+				"internal",
+				"deleteUser failed"
+			);
+		}
+}
+}
+
 async function updateuser(data, context) {
- // data = {uid, update} === update = {key: value}
+	// data = {uid, update} === update = {key: value}
 	if (!isAdmin(context.auth.token.email)) {
 		if (Constant.DEV) console.log("not admin", context.auth.token.email);
 		throw new functions.https.HttpsError(
@@ -34,8 +59,8 @@ async function updateuser(data, context) {
 
 	try {
 		const uid = data.uid;
-const update = data.update;
-await admin.auth().updateUser(uid, update);
+		const update = data.update;
+		await admin.auth().updateUser(uid, update);
 	} catch (error) {
 		if (Constant.DEV) {
 			console.log(error);
