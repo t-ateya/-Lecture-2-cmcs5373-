@@ -169,7 +169,7 @@ function buildProductCard(product) {
         </div>
         <form class="form-edit-product float-start" method="post">
             <input type="hidden" name="docId" value="${product.docId}" />
-            <button class="btn btn-outline-primary" type="submit">Edit</button>
+            <button class="btn btn-outline-primary" id="edit-btn" type="submit">Edit</button>
         </form>
         <form class="form-delete-product float-end"
         method="post">

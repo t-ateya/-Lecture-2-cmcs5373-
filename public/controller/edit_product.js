@@ -32,8 +32,8 @@ export function addEventListeners() {
 			name: e.target.name.value,
 			price: e.target.price.value,
 			summary: e.target.summary.value,
-			docId: e.target.docId.value,
 		});
+			p.docId= e.target.docId.value;
 		const errors = p.validate(true); // bypass image file check
 		Element.formEditProduct.errorName.innerHTML = errors.name
 			? errors.name
@@ -68,7 +68,7 @@ export function addEventListeners() {
 			cardTag.getElementsByClassName("card-title")[0].innerHTML = p.name;
 			cardTag.getElementsByClassName(
 				"card-text"
-			)[0].innerHTML = `$ ${p.sprice}<br > ${p.summary}`;
+			)[0].innerHTML = `$ ${p.price}<br > ${p.summary}`;
 			Util.info(
 				"Updated",
 				`${p.name} is updated successfully`,
