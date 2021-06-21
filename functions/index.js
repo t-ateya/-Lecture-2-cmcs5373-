@@ -17,7 +17,7 @@ exports.cf_updateProduct = functions.https.onCall(updateProduct);
 exports.cf_deleteProduct = functions.https.onCall(deleteProduct);
 exports.cf_getUserList = functions.https.onCall(getUserList);
 exports.cf_updateUser = functions.https.onCall(updateUser);
-exports.cf_deleteUser = functions.https.onCall(cf_deleteUser);
+exports.cf_deleteUser = functions.https.onCall(deleteUser);
 
 function isAdmin(email) {
 	return Constant.adminEmails.includes(email);
@@ -47,7 +47,7 @@ async function deleteUser(data, context) {
 }
 }
 
-async function updateuser(data, context) {
+async function updateUser(data, context) {
 	// data = {uid, update} === update = {key: value}
 	if (!isAdmin(context.auth.token.email)) {
 		if (Constant.DEV) console.log("not admin", context.auth.token.email);
