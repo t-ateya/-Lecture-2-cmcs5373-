@@ -14,7 +14,6 @@ export class Product {
             summary: this.summary,
             imageName: this.imageName,
             imageURL: this.imageURL,
-
         };
     }
     serializeForUpdate() {
@@ -50,6 +49,4 @@ export class Product {
 
         return errors;
     }
-
-
 }

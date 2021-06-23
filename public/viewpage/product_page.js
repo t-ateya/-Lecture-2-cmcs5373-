@@ -52,14 +52,19 @@ export async function product_page() {
     let html = `
         <div class="d-flex justify-content-between align-items-center">
             <button id="button-add-product" class="btn btn-outline-success mb-3">+ Add Product</button>
-			<form id="filter-product-form" method="GET">
-				<div class="input-group mb-3">
+			<form class="form form-inline" id="filter-product-form" method="GET">
+				<div div class = "input-group mb-3">
+					<select class="form-select form-select-sm" name="order" aria-label="Select sorting order">
+						<option value="1">Ascending order</option>
+						<option value="0">Descending order</option>
+					</select>
 					<select class="form-select form-select-sm" name="filterBy" aria-label="filter products form">
 						<option selected>-- Filter by --</option>
 						<option value="id">id</option>
 						<option value="name">product name</option>
 						<option value="price">price</option>
 					</select>
+
 					<button class="btn btn-primary" type="submit">filter</button>
 				</div>
 			</form>
@@ -138,14 +143,20 @@ export async function product_page() {
     document.querySelector('#filter-product-form').addEventListener("submit", async(e) => {
         e.preventDefault();
         const filterAttribute = e.target.filterBy.value;
+        const filterOrder = e.target.order.value; // 1 => asc 0 => desc
         const filteredProducts = await FirebaseController.getProductList();
         const productTableBody = document.getElementById('product-table-body');
 
         // return if no data is available
         if (!filteredProducts) await product_page();
 
+        const options = {
+            attribute: filterAttribute,
+            order: filterOrder
+        };
+
         // reorganize the data based on the filtered attribute
-        const filteredProductList = shuffleProducts(filteredProducts, filterAttribute);
+        const filteredProductList = shuffleProducts(filteredProducts, options);
         // empty the product list table tbody
         productTableBody.innerHTML = '';
         filteredProductList.forEach((product, index) => {
@@ -239,17 +250,17 @@ function buildProductCard(product, index) {
     `;
 }
 
-function shuffleProducts(products, attribute) {
+function shuffleProducts(products, options) {
     let result;
-    switch (attribute) {
+    switch (options.attribute) {
         case "id":
-            result = products.reverse();
+            result = options.order == "1" ? products.reverse() : products;
             break;
         case "name":
-            result = products.sort((a, b) => a.name > b.name);
+            result = products.sort((a, b) => options.order == "1" ? a.name > b.name : a.name < b.name);
             break;
         case "price":
-            result = products.sort((a, b) => a.price > b.price);
+            result = products.sort((a, b) => options.order == "1" ? Number(a.price) > Number(b.price) : Number(a.price) < Number(b.price));
             break;
         default:
             break;

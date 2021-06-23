@@ -11,6 +11,7 @@ export const menuSignout = document.getElementById('menu-signout');
 //forms
 export const formSignin = document.getElementById('form-signin');
 export const filterProductForm = document.getElementById('filter-product-form');
+export const userForm = document.getElementById('form-user');
 export const formAddProduct = {
     form: document.getElementById('form-add-product'),
     errorName: document.getElementById('form-add-product-error-name'),
