@@ -19,6 +19,7 @@ exports.cf_getUserList = functions.https.onCall(getUserList);
 exports.cf_updateUser = functions.https.onCall(updateUser);
 exports.cf_deleteUser = functions.https.onCall(deleteUser);
 exports.cf_addUser = functions.https.onCall(addUser);
+exports.cf_updateUserById = functions.https.onCall(updateUserById);
 
 function isAdmin(email) {
     return Constant.adminEmails.includes(email);
@@ -26,7 +27,6 @@ function isAdmin(email) {
 
 async function deleteUser(data, context) {
     // data => uid
-
     if (!isAdmin(context.auth.token.email)) {
         if (Constant.DEV) console.log("not admin", context.auth.token.email);
         throw new functions.https.HttpsError(
@@ -284,4 +284,34 @@ async function addProduct(data, context) {
         if (Constant.DEV) console.log(e);
         throw new functions.https.HttpsError("internal", "addProduct failed");
     }
+}
+
+/**
+ * Get user by user uid
+ * @param {string} userUid 
+ */
+async function updateUserById(data, context) {
+    if (!isAdmin(context.auth.token.email)) {
+        if (Constant.DEV) console.log("not admin", context.auth.token.email);
+        throw new functions.https.HttpsError(
+            "unauthenticated",
+            "Only admin may invoke this function"
+        );
+    }
+    // object destructuring
+    const {
+        userUid,
+        ...updatedUserInfo
+    } = data;
+
+    admin
+        .auth()
+        .updateUser(userUid, updatedUserInfo)
+        .then((userRecord) => {
+            // See the UserRecord reference doc for the contents of userRecord.
+            return userRecord;
+        })
+        .catch((error) => {
+            return null;
+        });
 }

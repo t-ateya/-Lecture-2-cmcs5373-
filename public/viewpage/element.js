@@ -11,7 +11,7 @@ export const menuSignout = document.getElementById('menu-signout');
 //forms
 export const formSignin = document.getElementById('form-signin');
 export const filterProductForm = document.getElementById('filter-product-form');
-export const userForm = document.getElementById('form-user');
+export const userForm = document.getElementById('user-form');
 export const formAddProduct = {
     form: document.getElementById('form-add-product'),
     errorName: document.getElementById('form-add-product-error-name'),
@@ -50,5 +50,9 @@ export const modalAddProduct = new bootstrap.Modal(document.getElementById('moda
 });
 
 export const modalEditProduct = new bootstrap.Modal(document.getElementById('modal-edit-product'), {
+    backdrop: 'static'
+});
+
+export const userModal = new bootstrap.Modal(document.getElementById('modal-user'), {
     backdrop: 'static'
 });

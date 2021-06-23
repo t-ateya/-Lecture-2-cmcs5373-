@@ -20,7 +20,7 @@ export async function users_page() {
     }
     let html = `
         <h1>Welcome to User Management Page</h1>
-		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-user">
+		<button type="button" class="btn btn-primary" id="btn-create-user" data-bs-toggle="modal" data-bs-target="#modal-user">
 		 👤 create new user
 		</button>
     `;
@@ -32,7 +32,10 @@ export async function users_page() {
 			 <table class="table table-stripped">
 				<thead>
 					<tr>
+						<td>Profile Image</td>
+						<td>Name</td>
 						<td>Email</td>
+						<td>Phone number</td>
 						<td>Status</td>
 						<td>Action</td>
 					</tr>
@@ -83,6 +86,8 @@ export async function users_page() {
             Util.enableButton(button, label);
         });
     }
+
+    // handle delete functionality
     const deleteForms = document.getElementsByClassName("form-delete-user");
     for (let i = 0; i < deleteForms.length; i++) {
         deleteForms[i].addEventListener("submit", async(e) => {
@@ -107,12 +112,79 @@ export async function users_page() {
             }
         });
     }
+
+    // handle update user functionality
+    const editBtns = document.getElementsByClassName('edit-btn');
+    for (let i = 0; i < editBtns.length; i++) {
+        editBtns[i].addEventListener('click', e => {
+            // get clicked user uid from btn
+            const userUid = e.target.dataset.uid;
+            // set form submit mode to update
+            Element.userForm.dataset.mode = "update";
+            // set
+            Element.userForm.userUid.value = userUid;
+
+            // update modal title to edit user
+            document.getElementById('modal-user-title').textContent = 'Edit user';
+            document.getElementById('user-btn-submit').textContent = 'Update';
+
+            // look for user with uid from database
+            const updatedUserInfo = {
+                email: 'modifiedUser@example.com',
+                phoneNumber: '+11234567890',
+                emailVerified: true,
+                password: 'newPassword',
+                displayName: 'Jane Doe',
+                photoURL: 'http://www.example.com/12345678/photo.png',
+                disabled: true,
+            };
+            // if user exits
+            // prepopulate the user modal
+
+            // change the save button to update
+        });
+    }
+
+    // handle user form submit event
+    Element.userForm.addEventListener('submit', async(e) => {
+        e.preventDefault();
+        // get all form data
+        const updatedUserInfo = {
+            userUid: e.target.userUid.value.trim(),
+            email: e.target.email.value.trim() || 'user@test.com',
+            displayName: `${e.target.firstName.value.trim()} ${e.target.lastName.value.trim()}` || null,
+            password: e.target.password.value || '123456',
+            phoneNumber: e.target.phoneNumber.value.trim(),
+            photoUrl: e.target.photoUrl || null
+        };
+
+        // check form mode
+        const formMode = e.target.dataset.mode;
+        if (formMode === 'create') {
+            await createUser(updatedUserInfo);
+        } else {
+            await editUser(updatedUserInfo);
+        }
+    });
+
+    // handle create new user
+    document.getElementById('btn-create-user').addEventListener('click', e => {
+        // update modal title to edit user
+        document.getElementById('modal-user-title').textContent = 'Create new user';
+        document.getElementById('user-btn-submit').textContent = 'Save';
+        Element.userForm.dataset.mode = "create";
+    });
 }
 
 function buildUserRow(user) {
     return `
 			<tr id="user-row-${user.uid}">
+				<td class="text-center">
+					<img src = "${user.photoURL}" alt="avatar of ${user.displayName || 'no avatar'}" class="img-fluid rounded rounded-circle shadow-sm" />
+				</td>
+				<td>${user.diplayName || 'not provided'}</td>
 				<td>${user.email}</td>
+				<td>${user.phoneNumber || 'not provided'}</td>
 				<td id="user-status-${user.uid}">${user.disabled ? "Disabled" : "Active"}</td>
 				<td>
 					<form class="form-toggle-user" method="post" style="display: inline-block">
@@ -124,7 +196,35 @@ function buildUserRow(user) {
 						<input type="hidden" name="uid" value="${user.uid}" />
 						<button type="submit" class="btn btn-outline-danger">Delete</button>
 					</form>
+					<button type="button" class="btn btn-outline-warning edit-btn" data-uid="${user.uid}" data-bs-toggle="modal" data-bs-target="#modal-user">
+						🖊 edit user
+					</button>
 				</td>
 			</tr>
 			`;
+}
+
+async function updateUser(userData) {
+    try {
+        const userRef = await FirebaseController.updateUserById(userData);
+        console.log('user ref: ', userRef);
+        Util.info('User has been updated successfully: ', `reft (${userRef})`);
+        users_page();
+    } catch (error) {
+        if (Constant.DEV) console.log(error);
+        Util.info('An error occured: ', JSON.stringify(error));
+    }
+}
+async function createUser(userData) {
+    delete(userData.userUid);
+    console.log(userData);
+    try {
+        const userRef = await FirebaseController.addUser(userData);
+        console.log('user ref: ', userRef);
+        Util.info('User has been updated successfully: ', `reft (${userRef})`);
+        users_page();
+    } catch (error) {
+        if (Constant.DEV) console.log(error);
+        Util.info('An error occured: ', JSON.stringify(error));
+    }
 }
