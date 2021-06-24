@@ -103,7 +103,6 @@ export async function users_page() {
                 await FirebaseController.deleteUser(uid);
                 document.getElementById(`user-row-${uid}`).remove();
                 Util.info('Deleted', `user deleted: uid=${uid}`);
-
             } catch (error) {
                 if (Constant.DEV) {
                     console.log(error);
@@ -127,21 +126,6 @@ export async function users_page() {
             // update modal title to edit user
             document.getElementById('modal-user-title').textContent = 'Edit user';
             document.getElementById('user-btn-submit').textContent = 'Update';
-
-            // look for user with uid from database
-            const updatedUserInfo = {
-                email: 'modifiedUser@example.com',
-                phoneNumber: '+11234567890',
-                emailVerified: true,
-                password: 'newPassword',
-                displayName: 'Jane Doe',
-                photoURL: 'http://www.example.com/12345678/photo.png',
-                disabled: true,
-            };
-            // if user exits
-            // prepopulate the user modal
-
-            // change the save button to update
         });
     }
 
@@ -149,8 +133,8 @@ export async function users_page() {
     Element.userForm.addEventListener('submit', async(e) => {
         e.preventDefault();
         // get all form data
+        const uid = e.target.userUid.value.trim();
         const updatedUserInfo = {
-            userUid: e.target.userUid.value.trim(),
             email: e.target.email.value.trim() || 'user@test.com',
             displayName: `${e.target.firstName.value.trim()} ${e.target.lastName.value.trim()}` || null,
             password: e.target.password.value || '123456',
@@ -161,9 +145,9 @@ export async function users_page() {
         // check form mode
         const formMode = e.target.dataset.mode;
         if (formMode === 'create') {
-            await createUser(updatedUserInfo);
+            await FirebaseController.addUser(updatedUserInfo);
         } else {
-            await editUser(updatedUserInfo);
+            await FirebaseController.updateUser(uid, updatedUserInfo);
         }
     });
 
@@ -202,29 +186,4 @@ function buildUserRow(user) {
 				</td>
 			</tr>
 			`;
-}
-
-async function updateUser(userData) {
-    try {
-        const userRef = await FirebaseController.updateUserById(userData);
-        console.log('user ref: ', userRef);
-        Util.info('User has been updated successfully: ', `reft (${userRef})`);
-        users_page();
-    } catch (error) {
-        if (Constant.DEV) console.log(error);
-        Util.info('An error occured: ', JSON.stringify(error));
-    }
-}
-async function createUser(userData) {
-    delete(userData.userUid);
-    console.log(userData);
-    try {
-        const userRef = await FirebaseController.addUser(userData);
-        console.log('user ref: ', userRef);
-        Util.info('User has been updated successfully: ', `reft (${userRef})`);
-        users_page();
-    } catch (error) {
-        if (Constant.DEV) console.log(error);
-        Util.info('An error occured: ', JSON.stringify(error));
-    }
 }

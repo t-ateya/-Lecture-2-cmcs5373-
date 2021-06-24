@@ -57,7 +57,7 @@ async function addUser(data, context) {
         );
     }
     try {
-        const ref = await admin.createUser(data);
+        await admin.createUser(data);
         Util.info('Successfully created new user: ', ref.uid);
 
     } catch (error) {
@@ -284,34 +284,4 @@ async function addProduct(data, context) {
         if (Constant.DEV) console.log(e);
         throw new functions.https.HttpsError("internal", "addProduct failed");
     }
-}
-
-/**
- * Get user by user uid
- * @param {string} userUid 
- */
-async function updateUserById(data, context) {
-    if (!isAdmin(context.auth.token.email)) {
-        if (Constant.DEV) console.log("not admin", context.auth.token.email);
-        throw new functions.https.HttpsError(
-            "unauthenticated",
-            "Only admin may invoke this function"
-        );
-    }
-    // object destructuring
-    const {
-        userUid,
-        ...updatedUserInfo
-    } = data;
-
-    admin
-        .auth()
-        .updateUser(userUid, updatedUserInfo)
-        .then((userRecord) => {
-            // See the UserRecord reference doc for the contents of userRecord.
-            return userRecord;
-        })
-        .catch((error) => {
-            return null;
-        });
 }

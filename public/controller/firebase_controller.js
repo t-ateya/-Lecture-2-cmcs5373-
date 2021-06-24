@@ -112,5 +112,4 @@ const cf_updateUserById = firebase
 
 export async function updateUserById(userInfo) {
     const userRef = await cf_updateUserById(userInfo);
-    return userRef ? userRef : null;
 }
