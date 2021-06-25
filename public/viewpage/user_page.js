@@ -71,7 +71,7 @@ export async function users_page() {
                 await FirebaseController.updateUser(uid, update);
                 e.target.disabled.value = `${update.disabled}`;
                 document.getElementById(`user-status-${uid}`).innerHTML = `${
-					update.disabled ? "Disabled" : "Active"
+					update.disabled ? "<span class='badge bg-danger'>disabled</span>" : "<span class='badge bg-success'>active</span>"
 				}`;
                 Util.info("Status toggled", `Disabled ${update.disabled}`);
             } catch (error) {
@@ -196,7 +196,7 @@ function buildUserRow(user) {
 				<td>${user.displayName}</td>
 				<td>${user.email}</td>
 				<td>${user.phoneNumber || 'not provided'}</td>
-				<td id="user-status-${user.uid}">${user.disabled ? "Disabled" : "Active"}</td>
+				<td id="user-status-${user.uid}">${user.disabled ? "<span class='badge bg-danger'>disabled</span>" : "<span class='badge bg-success'>active</span>"}</td>
 				<td>
 					<form class="form-toggle-user" method="post" style="display: inline-block">
 						<input type="hidden" name="uid" value="${user.uid}" />
