@@ -85,6 +85,12 @@ export async function getUserList() {
     return result.data;
 }
 
+/* get user */
+const cf_getUser = firebase.functions().httpsCallable("cf_getUser");
+export async function getUser(id) {
+    const result = await cf_getUser(id);
+    return result.data;
+}
 
 const cf_updateUser = firebase.functions().httpsCallable("cf_updateUser");
 export async function updateUser(uid, update) {
@@ -100,24 +106,8 @@ export async function deleteUser(uid) {
     await cf_deleteUser(uid);
 }
 
-export async function addUser(userModel) {
-    admin
-        .auth()
-        .createUser({
-            email: 'user@example.com',
-            emailVerified: false,
-            phoneNumber: '+11234567890',
-            password: 'secretPassword',
-            displayName: 'John Doe',
-            photoURL: 'http://www.example.com/12345678/photo.png',
-            disabled: false,
-        })
-        .then((userRecord) => {
-            // See the UserRecord reference doc for the contents of userRecord.
-            console.log('Successfully created new user:', userRecord.uid);
-        })
-        .catch((error) => {
-            console.log('Error creating new user:', error);
-        });
-
+const cf_addUser = firebase.functions().httpsCallable("cf_addUser");
+export async function addUser(userData) {
+    const userRef = await cf_addUser(userData);
+    return userRef;
 }

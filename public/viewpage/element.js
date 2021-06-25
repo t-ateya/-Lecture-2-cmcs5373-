@@ -52,3 +52,11 @@ export const modalAddProduct = new bootstrap.Modal(document.getElementById('moda
 export const modalEditProduct = new bootstrap.Modal(document.getElementById('modal-edit-product'), {
     backdrop: 'static'
 });
+
+export const userModal = {
+    modal: new bootstrap.Modal(document.getElementById('modal-user'), {
+        backdrop: 'static'
+    }),
+    title: document.querySelector('#modal-user-title'),
+    submitBtn: document.querySelector('#form-user-submit-btn')
+};
