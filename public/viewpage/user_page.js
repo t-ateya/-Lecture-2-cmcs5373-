@@ -126,7 +126,6 @@ export async function users_page() {
         const label = Util.disableButton(e.target);
         const userUid = e.target.dataset.uid;
 
-        console.log('user id: ', userUid);
         selectedUser = await FirebaseController.getUser(userUid);
         Element.userModal.modal.show();
         Util.enableButton(e.target, label);
@@ -136,9 +135,9 @@ export async function users_page() {
         let lastName = '';
         if (selectedUser.displayName) {
             if (selectedUser.displayName.includes(" ")) {
-                [firstName, lastName] = selectedUser.displayName.split(" ");
+                [firstName, lastName] = selectedUser.displayName.split(" "); // "John Doe"
             } else {
-                firstName = selectedUser.displayName;
+                firstName = selectedUser.displayName; // "John"
             }
         }
 

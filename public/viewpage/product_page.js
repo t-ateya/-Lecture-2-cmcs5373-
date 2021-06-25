@@ -59,8 +59,7 @@ export async function product_page() {
 						<option value="0">Descending order</option>
 					</select>
 					<select class="form-select form-select-sm" name="filterBy" aria-label="filter products form">
-						<option selected>-- Filter by --</option>
-						<option value="id">id</option>
+						<option value="id" selected>id</option>
 						<option value="name">product name</option>
 						<option value="price">price</option>
 					</select>
@@ -146,13 +145,14 @@ export async function product_page() {
         const filterOrder = e.target.order.value; // 1 => asc 0 => desc
         const filteredProducts = await FirebaseController.getProductList();
         const productTableBody = document.getElementById('product-table-body');
+        console.log('product form');
 
         // return if no data is available
         try {
-            if (filteredProducts === null) {
-                await product_page();
-                return;
-            }
+            // if (filteredProducts === null) {
+            //     await product_page();
+            //     return;
+            // }
 
             const options = {
                 attribute: filterAttribute,
@@ -261,14 +261,22 @@ function shuffleProducts(products, options) {
     let result;
     switch (options.attribute) {
         case "name":
-            result = products.sort((a, b) => options.order == "1" ? a.name > b.name : a.name < b.name);
+            result = products.sort((a, b) => {
+                if (options.order === "1") {
+                    // asc order by name
+                    return a.name > b.name ? 1 : -1;
+                } else {
+                    return a.name < b.name ? 1 : -1;
+                }
+            });
             break;
         case "price":
-            result = products.sort((a, b) => options.order == "1" ? Number(a.price) > Number(b.price) : Number(a.price) < Number(b.price));
+            result = products.sort((a, b) => options.order === "1" ? a.price - b.price : b.price - a.price);
             break;
         case "id":
-        default:
             result = options.order == "1" ? products.reverse() : products;
+            break;
+        default:
             break;
     }
     return result;

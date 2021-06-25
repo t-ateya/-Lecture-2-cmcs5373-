@@ -49,6 +49,7 @@ async function deleteUser(data, context) {
     }
 }
 
+// create a new user
 async function addUser(data, context) {
     if (!isAdmin(context.auth.token.email)) {
         if (Constant.DEV) console.log("not admin", context.auth.token.email);
