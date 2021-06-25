@@ -1,4 +1,4 @@
-exports.DEV = true; //Developer's mode
+exports.DEV = false; //Developer's mode
 
 exports.adminEmails = [
     'admin@test.com',
