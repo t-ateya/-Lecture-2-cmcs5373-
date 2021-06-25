@@ -5,6 +5,7 @@ const serviceAccount = require("./account_key.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://cmsc5373-terencea.firebaseio.com'
 });
 
 const Constant = require("./constant.js");
@@ -19,7 +20,7 @@ exports.cf_getUserList = functions.https.onCall(getUserList);
 exports.cf_updateUser = functions.https.onCall(updateUser);
 exports.cf_deleteUser = functions.https.onCall(deleteUser);
 exports.cf_addUser = functions.https.onCall(addUser);
-exports.cf_updateUserById = functions.https.onCall(updateUserById);
+exports.cf_getUser = functions.https.onCall(getUser);
 
 function isAdmin(email) {
     return Constant.adminEmails.includes(email);
@@ -57,12 +58,11 @@ async function addUser(data, context) {
         );
     }
     try {
-        await admin.createUser(data);
-        Util.info('Successfully created new user: ', ref.uid);
-
+        const ref = await admin.auth().createUser(data);
+        return ref;
     } catch (error) {
         if (Constant.DEV) console.log(error);
-        Util.info('Error creating user: ', JSON.stringify(error));
+        throw new functions.https.HttpsError('internal', `create user failde: ${error}`);
     }
 
 }
@@ -88,6 +88,30 @@ async function updateUser(data, context) {
             throw new functions.https.HttpsError(
                 "internal",
                 "updateUser failed"
+            );
+        }
+    }
+}
+
+async function getUser(userId, context) {
+    // data = {uid, update} === update = {key: value}
+    if (!isAdmin(context.auth.token.email)) {
+        if (Constant.DEV) console.log("not admin", context.auth.token.email);
+        throw new functions.https.HttpsError(
+            "unauthenticated",
+            "Only admin may invoke this function"
+        );
+    }
+    try {
+        const userRecord = await admin.auth().getUser(userId);
+        return userRecord.toJSON();
+    } catch (error) {
+        if (Constant.DEV) {
+            console.log(error);
+
+            throw new functions.https.HttpsError(
+                "internal",
+                "getUser failed"
             );
         }
     }

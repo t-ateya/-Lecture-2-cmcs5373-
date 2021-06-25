@@ -1,13 +1,12 @@
-import * as Element from '../viewpage/element.js'
-import * as FirebaseController from './firebase_controller.js'
-import * as Constant from '../model/constant.js'
-import * as Util from '../viewpage/util.js'
+import * as Element from '../viewpage/element.js';
+import * as FirebaseController from './firebase_controller.js';
+import * as Constant from '../model/constant.js';
+import * as Util from '../viewpage/util.js';
 import * as Route from './routes.js';
 
 export let currentUser;
 
 export function addEventListeners() {
-    console.log('auth event listeners');
     Element.formSignin.addEventListener('submit', async e => {
         e.preventDefault(); //prevent refresh
         const email = e.target.email.value;
@@ -26,16 +25,16 @@ export function addEventListeners() {
             Util.info('Sign In Error', JSON.stringify(error), Element.modalSignin);
         }
 
-    })
+    });
 
     Element.menuSignout.addEventListener('click', async() => {
         try {
             await FirebaseController.signOut();
         } catch (e) {
             if (Constant.DEV) console.log(e);
-            Util.info('Sign Out Error: Try again', JSON.stringify(e))
+            Util.info('Sign Out Error: Try again', JSON.stringify(e));
         }
-    })
+    });
 
     firebase.auth().onAuthStateChanged(user => {
         if (user && Constant.adminEmails.includes(user.email)) {
