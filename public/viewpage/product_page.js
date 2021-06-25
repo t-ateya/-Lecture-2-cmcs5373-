@@ -149,7 +149,10 @@ export async function product_page() {
 
         // return if no data is available
         try {
-            if (!filteredProducts) await product_page();
+            if (filteredProducts === null) {
+                await product_page();
+                return;
+            }
 
             const options = {
                 attribute: filterAttribute,
