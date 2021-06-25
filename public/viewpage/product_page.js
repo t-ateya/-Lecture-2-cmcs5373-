@@ -148,20 +148,24 @@ export async function product_page() {
         const productTableBody = document.getElementById('product-table-body');
 
         // return if no data is available
-        if (!filteredProducts) await product_page();
+        try {
+            if (!filteredProducts) await product_page();
 
-        const options = {
-            attribute: filterAttribute,
-            order: filterOrder
-        };
+            const options = {
+                attribute: filterAttribute,
+                order: filterOrder
+            };
 
-        // reorganize the data based on the filtered attribute
-        const filteredProductList = shuffleProducts(filteredProducts, options);
-        // empty the product list table tbody
-        productTableBody.innerHTML = '';
-        filteredProductList.forEach((product, index) => {
-            productTableBody.innerHTML += buildProductCard(product, index);
-        });
+            // reorganize the data based on the filtered attribute
+            const filteredProductList = shuffleProducts(filteredProducts, options);
+            // empty the product list table tbody
+            productTableBody.innerHTML = '';
+            filteredProductList.forEach((product, index) => {
+                productTableBody.innerHTML += buildProductCard(product, index);
+            });
+        } catch (error) {
+            console.log("Error: ", error);
+        }
 
     });
 }
@@ -253,16 +257,15 @@ function buildProductCard(product, index) {
 function shuffleProducts(products, options) {
     let result;
     switch (options.attribute) {
-        case "id":
-            result = options.order == "1" ? products.reverse() : products;
-            break;
         case "name":
             result = products.sort((a, b) => options.order == "1" ? a.name > b.name : a.name < b.name);
             break;
         case "price":
             result = products.sort((a, b) => options.order == "1" ? Number(a.price) > Number(b.price) : Number(a.price) < Number(b.price));
             break;
+        case "id":
         default:
+            result = options.order == "1" ? products.reverse() : products;
             break;
     }
     return result;
